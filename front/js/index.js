@@ -35,7 +35,3 @@ async function displayProducts() {
     productsSection.innerHTML += productsItems;
   }
 }
-// manipuler le tableau de produits en bouclant grâce à JS pour parcourir tous les elements
-// créer une variable productsItems qui contient une chaine de caracteres vide
-// dans notre boucle concatené tous les produits en remplaçant dans le html les valeurs statiques
-// afficher à l'intérieur de la section items le contenu de la variable productsItems
