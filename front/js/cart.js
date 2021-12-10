@@ -138,3 +138,110 @@ function deleteItem() {
     });
   });
 }
+
+//-------------------------------- Formulaire --------------------------------------------
+
+// Variables Regex
+let nameRegex = /^[a-zA-Z\-çñàéèêëïîôüù ]{2,}$/;
+let adressRegex = /^[0-9a-zA-Z\s,.'-çñàéèêëïîôüù]{3,}$/;
+let emailRegex = /^[A-Za-z0-9\-\.]+@([A-Za-z0-9\-]+\.)+[A-Za-z0-9-]{2,4}$/;
+// Variables pour récupérer les id des champs de formulaire
+const firstName = document.getElementById("firstName");
+const lastName = document.getElementById("lastName");
+const address = document.getElementById("address");
+const city = document.getElementById("city");
+const email = document.getElementById("email");
+
+firstName.addEventListener("input", (event) => {
+  event.preventDefault();
+  if (nameRegex.test(firstName.value) == false || firstName.value == "") {
+    document.getElementById("firstNameErrorMsg").innerHTML =
+      "Prénom non valide";
+  } else {
+    document.getElementById("firstNameErrorMsg").innerHTML = "";
+  }
+});
+lastName.addEventListener("input", (event) => {
+  event.preventDefault();
+  if (nameRegex.test(lastName.value) == false || lastName.value == "") {
+    document.getElementById("lastNameErrorMsg").innerHTML = "Nom non valide";
+  } else {
+    document.getElementById("lastNameErrorMsg").innerHTML = "";
+  }
+});
+address.addEventListener("input", (event) => {
+  event.preventDefault();
+  if (adressRegex.test(address.value) == false || address.value == "") {
+    document.getElementById("addressErrorMsg").innerHTML = "Adresse non valide";
+  } else {
+    document.getElementById("addressErrorMsg").innerHTML = "";
+  }
+});
+city.addEventListener("input", (event) => {
+  event.preventDefault();
+  if (nameRegex.test(city.value) == false || city.value == "") {
+    document.getElementById("cityErrorMsg").innerHTML = "Ville non valide";
+  } else {
+    document.getElementById("cityErrorMsg").innerHTML = "";
+  }
+});
+email.addEventListener("input", (event) => {
+  event.preventDefault();
+  if (emailRegex.test(email.value) == false || email.value == "") {
+    document.getElementById("emailErrorMsg").innerHTML = "Email non valide";
+  } else {
+    document.getElementById("emailErrorMsg").innerHTML = "";
+  }
+});
+
+let order = document.getElementById("order");
+order.addEventListener("click", (e) => {
+  e.preventDefault();
+  // création d'un tableau afin de récuperer les données de l'utilisateur
+  let contact = {
+    firstName: firstName.value,
+    lastName: lastName.value,
+    address: address.value,
+    city: city.value,
+    email: email.value,
+  };
+
+  if (
+    firstName.value === "" ||
+    lastName.value === "" ||
+    address.value === "" ||
+    city.value === "" ||
+    email.value === ""
+  ) {
+    window.confirm("Vos coordonnées ne sont pas complètes !");
+  } else {
+    let products = [];
+    itemsInLocalStorage.forEach((order) => {
+      products.push(order.id);
+      console.log(products);
+    });
+
+    let pageOrder = { contact, products };
+
+    // je fais un appel à l'api order pour envoyer mes tableaux
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(pageOrder),
+    })
+      .then((res) => {
+        console.log(res);
+        return res.json();
+      })
+      .then((confirm) => {
+        window.location.href = "./confirmation.html?orderId=" + confirm.orderId;
+        localStorage.clear();
+      })
+      .catch((error) => {
+        console.log("une erreur est survenue");
+      });
+  }
+});
