@@ -35,11 +35,6 @@ function addToCart(productItem) {
   }
 }
 
-// fonction fléchée
-// function noName(product){
-//   return product.id === 'cerises';
-// }
-
 //récupération des produits de l'API
 function displayProduct() {
   fetch("http://localhost:3000/api/products/" + productId)
