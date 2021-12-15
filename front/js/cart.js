@@ -1,16 +1,20 @@
+// Initialisation du localstorage
 let itemsInLocalStorage = JSON.parse(localStorage.getItem("cartItems"));
+
+// Affichage du contenu du panier
 async function displayCart() {
+  const parser = new DOMParser();
   const positionEmptyCart = document.getElementById("cart__items");
   let cartArray = [];
 
+  // Si le localstorage est vide
   if (itemsInLocalStorage === null || itemsInLocalStorage == 0) {
-    const emptyCart = `<p>Votre panier est vide</p>`;
-    positionEmptyCart.innerHTML = emptyCart;
+    positionEmptyCart.textContent = "Votre panier est vide";
   } else {
+    // Si le localstorage contient des produits
     for (i = 0; i < itemsInLocalStorage.length; i++) {
       const product = await getProductById(itemsInLocalStorage[i].id);
       const totalPriceItem = (product.price *= itemsInLocalStorage[i].quantity);
-      console.log(totalPriceItem);
       cartArray += `
        <article class="cart__item" data-id=${itemsInLocalStorage[i].id}>
        <div class="cart__item__img">
@@ -43,52 +47,40 @@ async function displayCart() {
     for (i = 0; i < itemsInLocalStorage.length; i++) {
       const article = await getProductById(itemsInLocalStorage[i].id);
       totalQuantity += parseInt(itemsInLocalStorage[i].quantity);
-      console.log(totalQuantity);
       totalPrice += parseInt(article.price * itemsInLocalStorage[i].quantity);
-      console.log(totalPrice);
     }
     document.getElementById("totalQuantity").innerHTML = totalQuantity;
     document.getElementById("totalPrice").innerHTML = totalPrice;
     if (i == itemsInLocalStorage.length) {
-      positionEmptyCart.innerHTML = cartArray;
+      const displayBasket = parser.parseFromString(cartArray, "text/html");
+      positionEmptyCart.appendChild(displayBasket.body);
       changeQuantity();
       deleteItem();
     }
   }
 }
+// Récupération des produits de l'API
 async function getProductById(productId) {
-  return (
-    fetch("http://localhost:3000/api/products/" + productId)
-      .then(function (res) {
-        //  console.log (res.json())
-        return res.json();
-      })
-      .catch((err) => {
-        // Une erreur est survenue
-        console.log("erreur");
-      })
-
-      //insertion des données de l'API dans le DOM (titre, img, nom, prix, description et option couleurs)
-      .then(function (response) {
-        return response;
-      })
-  );
+  return fetch("http://localhost:3000/api/products/" + productId)
+    .then(function (res) {
+      return res.json();
+    })
+    .catch((err) => {
+      // Une erreur est survenue
+      console.log("erreur");
+    })
+    .then(function (response) {
+      return response;
+    });
 }
 displayCart();
 
-// Prix total du panier
-
-// Modifier la quantité
-
+// Modification de la quantité
 function changeQuantity() {
   const quantityInputs = document.querySelectorAll(".itemQuantity");
-  console.log(quantityInputs);
   quantityInputs.forEach((quantityInput) => {
     quantityInput.addEventListener("change", (event) => {
       event.preventDefault();
-      console.log(event);
-      console.log(event.target.getAttribute("data-id"));
-      console.log(event.target.getAttribute("data-color"));
       const inputValue = event.target.value;
       const dataId = event.target.getAttribute("data-id");
       const dataColor = event.target.getAttribute("data-color");
@@ -113,17 +105,14 @@ function changeQuantity() {
   });
 }
 
-// Supprimer un article
-
+// Suppression d'un article
 function deleteItem() {
   const deleteButtons = document.querySelectorAll(".deleteItem");
-  console.log(deleteButtons);
   deleteButtons.forEach((deleteButton) => {
     deleteButton.addEventListener("click", (event) => {
       event.preventDefault();
       const deleteId = event.target.getAttribute("data-id");
       const deleteColor = event.target.getAttribute("data-color");
-      console.log(deleteId, deleteColor);
       itemsInLocalStorage = itemsInLocalStorage.filter(
         (element) => !(element.id == deleteId && element.color == deleteColor)
       );
@@ -133,8 +122,8 @@ function deleteItem() {
       if (deleteConfirm == true) {
         localStorage.setItem("cartItems", JSON.stringify(itemsInLocalStorage));
         location.reload();
+        alert("Article supprimé avec succès");
       }
-      alert("Article supprimé avec succès");
     });
   });
 }
@@ -152,6 +141,7 @@ const address = document.getElementById("address");
 const city = document.getElementById("city");
 const email = document.getElementById("email");
 
+// Validation prénom
 firstName.addEventListener("input", (event) => {
   event.preventDefault();
   if (nameRegex.test(firstName.value) == false || firstName.value == "") {
@@ -161,36 +151,52 @@ firstName.addEventListener("input", (event) => {
     document.getElementById("firstNameErrorMsg").innerHTML = "";
   }
 });
+
+// Validation nom
 lastName.addEventListener("input", (event) => {
   event.preventDefault();
   if (nameRegex.test(lastName.value) == false || lastName.value == "") {
     document.getElementById("lastNameErrorMsg").innerHTML = "Nom non valide";
+    return false;
   } else {
     document.getElementById("lastNameErrorMsg").innerHTML = "";
+    return true;
   }
 });
+
+// Validation adresse
 address.addEventListener("input", (event) => {
   event.preventDefault();
   if (adressRegex.test(address.value) == false || address.value == "") {
     document.getElementById("addressErrorMsg").innerHTML = "Adresse non valide";
+    return false;
   } else {
     document.getElementById("addressErrorMsg").innerHTML = "";
+    return true;
   }
 });
+
+// Validation ville
 city.addEventListener("input", (event) => {
   event.preventDefault();
   if (nameRegex.test(city.value) == false || city.value == "") {
     document.getElementById("cityErrorMsg").innerHTML = "Ville non valide";
+    return false;
   } else {
     document.getElementById("cityErrorMsg").innerHTML = "";
+    return true;
   }
 });
+
+// Validation email
 email.addEventListener("input", (event) => {
   event.preventDefault();
   if (emailRegex.test(email.value) == false || email.value == "") {
     document.getElementById("emailErrorMsg").innerHTML = "Email non valide";
+    return false;
   } else {
     document.getElementById("emailErrorMsg").innerHTML = "";
+    return true;
   }
 });
 
@@ -213,17 +219,26 @@ order.addEventListener("click", (e) => {
     city.value === "" ||
     email.value === ""
   ) {
-    window.confirm("Vos coordonnées ne sont pas complètes !");
+    window.confirm(
+      "Vous devez renseigner vos coordonnées pour passer la commande !"
+    );
+  } else if (
+    nameRegex.test(firstName.value) == false ||
+    nameRegex.test(lastName.value) == false ||
+    adressRegex.test(address.value) == false ||
+    nameRegex.test(city.value) == false ||
+    emailRegex.test(email.value) == false
+  ) {
+    window.confirm("Merci de renseigner correctement vos coordonnées !");
   } else {
     let products = [];
     itemsInLocalStorage.forEach((order) => {
       products.push(order.id);
-      console.log(products);
     });
 
     let pageOrder = { contact, products };
 
-    // je fais un appel à l'api order pour envoyer mes tableaux
+    // Appel à l'api order pour envoyer les tableaux
     fetch("http://localhost:3000/api/products/order", {
       method: "POST",
       headers: {
@@ -233,7 +248,6 @@ order.addEventListener("click", (e) => {
       body: JSON.stringify(pageOrder),
     })
       .then((res) => {
-        console.log(res);
         return res.json();
       })
       .then((confirm) => {

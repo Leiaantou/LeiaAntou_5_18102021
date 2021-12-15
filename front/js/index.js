@@ -1,13 +1,9 @@
-// const products = getProducts();
-// console.log(products);
+// Appel à l'API products
 displayProducts();
 async function getProducts() {
   return await fetch("http://localhost:3000/api/products")
     .then(function (res) {
-      // if (res.ok) {
-      //  console.log (res.json())
       return res.json();
-      // }
     })
     .then(function (value) {
       console.log(value);
@@ -19,7 +15,9 @@ async function getProducts() {
     });
 }
 
+// Récupération des données et intégration dans le DOM
 async function displayProducts() {
+  const parser = new DOMParser();
   const products = await getProducts();
   console.log("displayProducts", products);
   let productsSection = document.getElementById("items");
@@ -32,6 +30,7 @@ async function displayProducts() {
       <p class="productDescription">${products[i].description}</p>
       </article> 
       </a>`;
-    productsSection.innerHTML += productsItems;
+    const doc3 = parser.parseFromString(productsItems, "text/html");
+    productsSection.appendChild(doc3.body.firstChild);
   }
 }
