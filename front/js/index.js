@@ -30,7 +30,7 @@ async function displayProducts() {
       <p class="productDescription">${products[i].description}</p>
       </article> 
       </a>`;
-    const doc3 = parser.parseFromString(productsItems, "text/html");
-    productsSection.appendChild(doc3.body.firstChild);
+    const displayShop = parser.parseFromString(productsItems, "text/html");
+    productsSection.appendChild(displayShop.body.firstChild);
   }
 }
