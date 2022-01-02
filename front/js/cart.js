@@ -86,17 +86,18 @@ function changeQuantity() {
       const dataColor = event.target.getAttribute("data-color");
       let cartItems = localStorage.getItem("cartItems");
       let items = JSON.parse(cartItems);
-      const resultat = items.find((product) => {
-        if (product.id === dataId && product.color === dataColor) return true;
-        return false;
+
+      items = items.map((item, index) => {
+        if (item.id === dataId && item.color === dataColor) {
+          item.quantity = inputValue;
+        }
+        return item;
       });
-      if (resultat != undefined) {
-        items = items.map((item, index) => {
-          if (item.id === dataId && item.color === dataColor) {
-            item.quantity = inputValue;
-          }
-          return item;
-        });
+
+      if (inputValue > 100) {
+        alert("La quantité maximale autorisée est de 100");
+        location.reload();
+        return;
       }
       let itemsStr = JSON.stringify(items);
       localStorage.setItem("cartItems", itemsStr);
@@ -116,6 +117,7 @@ function deleteItem() {
       itemsInLocalStorage = itemsInLocalStorage.filter(
         (element) => !(element.id == deleteId && element.color == deleteColor)
       );
+      console.log(itemsInLocalStorage);
       deleteConfirm = window.confirm(
         "Etes vous sûr de vouloir supprimer cet article ?"
       );
@@ -147,8 +149,10 @@ firstName.addEventListener("input", (event) => {
   if (nameRegex.test(firstName.value) == false || firstName.value == "") {
     document.getElementById("firstNameErrorMsg").innerHTML =
       "Prénom non valide";
+    return false;
   } else {
     document.getElementById("firstNameErrorMsg").innerHTML = "";
+    return true;
   }
 });
 
@@ -219,9 +223,7 @@ order.addEventListener("click", (e) => {
     city.value === "" ||
     email.value === ""
   ) {
-    window.confirm(
-      "Vous devez renseigner vos coordonnées pour passer la commande !"
-    );
+    alert("Vous devez renseigner vos coordonnées pour passer la commande !");
   } else if (
     nameRegex.test(firstName.value) == false ||
     nameRegex.test(lastName.value) == false ||
@@ -229,7 +231,7 @@ order.addEventListener("click", (e) => {
     nameRegex.test(city.value) == false ||
     emailRegex.test(email.value) == false
   ) {
-    window.confirm("Merci de renseigner correctement vos coordonnées !");
+    alerte("Merci de renseigner correctement vos coordonnées !");
   } else {
     let products = [];
     itemsInLocalStorage.forEach((order) => {

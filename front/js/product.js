@@ -10,6 +10,7 @@ function addToCart(productItem) {
   // Si panier vide
   if (cartItems === null) {
     let items = [productItem];
+    console.log(items);
     let itemsStr = JSON.stringify(items);
     localStorage.setItem("cartItems", itemsStr);
     alert("Produit ajouté au panier !");
@@ -19,13 +20,16 @@ function addToCart(productItem) {
     const resultat = items.find((product) => {
       if (product.id === productItem.id && product.color === productItem.color)
         return true;
+
       return false;
     });
+
     if (resultat != undefined) {
       items = items.map((item, index) => {
         if (item.id === productItem.id && item.color === productItem.color) {
           item.quantity += productItem.quantity;
         }
+
         return item;
       });
     } else {
@@ -68,7 +72,7 @@ function displayProduct() {
       productPrice.textContent = `${product.price}`;
 
       let productDescription = document.getElementById("description");
-      productDescription.textContent = `${product.name}`;
+      productDescription.textContent = `${product.description}`;
 
       document.querySelector("#colors").insertAdjacentHTML(
         "beforeend",
@@ -91,8 +95,11 @@ function displayProduct() {
       return;
     }
     // Si quantité = 0
-    else if (productQuantity == 0) {
+    if (productQuantity == 0) {
       alert("Veuillez renseigner une quantité");
+      return;
+    } else if (productQuantity > 100) {
+      alert("La quantité maximale autorisée est de 100");
       return;
     }
     // Création d'un tableau contenant l'id, la couleur et la quantité du produit ajouté
