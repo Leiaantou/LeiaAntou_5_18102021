@@ -231,7 +231,7 @@ order.addEventListener("click", (e) => {
     nameRegex.test(city.value) == false ||
     emailRegex.test(email.value) == false
   ) {
-    alerte("Merci de renseigner correctement vos coordonnées !");
+    alert("Merci de renseigner correctement vos coordonnées !");
   } else {
     let products = [];
     itemsInLocalStorage.forEach((order) => {
